@@ -335,6 +335,7 @@ export default function SignupForm({ property }) {
           as needed to complete the visit. Service availability, pricing, and treatment
           recommendations may vary by property, unit condition, and technician assessment.
         </p>
+        <a href="/privacy">Privacy notice</a>
       </footer>
     </main>
   );
