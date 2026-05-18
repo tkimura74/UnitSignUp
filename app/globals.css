@@ -247,6 +247,7 @@ input[type="text"],
 input[type="tel"],
 input[type="number"],
 input[type="password"],
+input[type="search"],
 textarea {
   width: 100%;
   min-height: 48px;
@@ -415,6 +416,41 @@ textarea:focus {
   gap: 8px;
 }
 
+.money-input {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: center;
+  border: 1px solid #bfcbd5;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.money-input > span {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  color: var(--muted);
+  background: #fff7f7;
+  border-right: 1px solid var(--line);
+  font-weight: 700;
+}
+
+.money-input input {
+  min-height: 46px;
+  border: 0;
+  border-radius: 0;
+}
+
+.money-input:focus-within {
+  outline: 3px solid rgba(215, 25, 32, 0.15);
+  border-color: var(--accent);
+}
+
+.money-input input:focus {
+  outline: 0;
+}
+
 .admin-check {
   display: flex !important;
   grid-template-columns: none;
@@ -488,6 +524,82 @@ th {
   overflow-wrap: anywhere;
 }
 
+.property-nav-panel {
+  position: sticky;
+  top: 18px;
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+}
+
+.property-search {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.property-nav-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.property-nav-item {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: #fffafa;
+  text-decoration: none;
+}
+
+.property-nav-item:hover {
+  border-color: #e5b3b5;
+  background: #fff1f1;
+}
+
+.property-nav-item span {
+  font-weight: 700;
+}
+
+.property-nav-item small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.property-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.property-title-row .card-label {
+  margin: 0;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.status-pill.is-active {
+  color: #17643b;
+  background: #eaf7ef;
+}
+
+.status-pill.is-inactive {
+  color: #7a3a10;
+  background: #fff0df;
+}
+
 .submission-count {
   margin: 8px 0 0;
   color: var(--muted);
@@ -521,6 +633,17 @@ th {
   color: var(--ink);
   font-weight: 700;
   overflow-wrap: anywhere;
+}
+
+.link-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.link-actions .secondary-button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 0.9rem;
 }
 
 .tech-page {
@@ -595,6 +718,7 @@ th {
 }
 
 .tech-unit {
+  position: relative;
   display: grid;
   gap: 12px;
   padding: 16px;
@@ -602,6 +726,22 @@ th {
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 12px 28px rgba(22, 32, 42, 0.08);
+}
+
+.route-order {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: var(--accent-strong);
+  background: #fff1f1;
+  font-weight: 700;
 }
 
 .tech-unit.is-complete {
@@ -784,5 +924,10 @@ th {
 
   .admin-grid {
     grid-template-columns: 1fr;
+  }
+
+  .property-nav-panel {
+    position: static;
+    max-height: none;
   }
 }

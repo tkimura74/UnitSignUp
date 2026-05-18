@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import CopyLinkButton from "./components/copy-link-button";
 import DeletePropertyForm from "./components/delete-property-form";
+import PropertyFilter from "./components/property-filter";
 import { isAdminAuthenticated } from "../../lib/admin-auth";
 import { formatHawaiiDate, formatHawaiiDateTime } from "../../lib/date-format";
 import { hasAdminSupabaseConfig, supabaseAdminFetch } from "../../lib/supabase-admin";
@@ -81,8 +83,8 @@ export default async function AdminPage() {
         <div className="admin-stack">
           <div className="admin-panel">
             <div className="panel-heading-row">
-              <h2>Submissions by property</h2>
-              <a className="secondary-button" href="/api/admin/export">Export all manager CSV</a>
+              <h2>Submissions By Property</h2>
+              <a className="secondary-button" href="/api/admin/export">Export All CSV</a>
             </div>
           </div>
 
@@ -108,12 +110,24 @@ export default async function AdminPage() {
               const technicianEmailBody = encodeURIComponent(
                 `Here is the route sheet for ${property.name}.\n\nService date: ${formatHawaiiDate(property.next_service_date)}\n\nOpen route sheet:\n${technicianUrl}`
               );
+              const propertySearch = `${property.name} ${property.slug} ${property.address || ""}`.toLowerCase();
 
               return (
-                <section className="admin-panel property-submission-panel" key={property.id}>
+                <section
+                  className="admin-panel property-submission-panel"
+                  id={`property-${property.slug}`}
+                  data-property-card
+                  data-search={propertySearch}
+                  key={property.id}
+                >
                   <div className="panel-heading-row">
                     <div>
-                      <p className="card-label">{property.is_active ? "Active property" : "Inactive property"}</p>
+                      <div className="property-title-row">
+                        <p className="card-label">Property</p>
+                        <span className={`status-pill ${property.is_active ? "is-active" : "is-inactive"}`}>
+                          {property.is_active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
                       <h2>{property.name}</h2>
                       <p className="submission-count">
                         {currentSubmissions.length} current signup{currentSubmissions.length === 1 ? "" : "s"}
@@ -121,13 +135,13 @@ export default async function AdminPage() {
                     </div>
                     <div className="export-actions">
                       <a className="secondary-button" href={`/api/admin/export?property=${property.slug}`}>
-                        Manager CSV
+                        Export CSV
                       </a>
                       <a
                         className="submit-button compact-button"
                         href={`mailto:?subject=${technicianEmailSubject}&body=${technicianEmailBody}`}
                       >
-                        Send Technician Link
+                        Email Technician Link
                       </a>
                     </div>
                   </div>
@@ -148,7 +162,10 @@ export default async function AdminPage() {
                     <div>
                       <span>Technician view</span>
                       {property.technician_token ? (
-                        <a href={technicianUrl}>Open route sheet</a>
+                        <div className="link-actions">
+                          <a href={technicianUrl}>Open route sheet</a>
+                          <CopyLinkButton value={technicianUrl} />
+                        </div>
                       ) : (
                         <strong>Run token migration</strong>
                       )}
@@ -191,7 +208,10 @@ export default async function AdminPage() {
                       </label>
                       <label>
                         Resident fee
-                        <input name="resident_fee" type="number" min="0" step="0.01" defaultValue={property.resident_fee} required />
+                        <span className="money-input">
+                          <span>$</span>
+                          <input name="resident_fee" type="number" min="0" step="0.01" defaultValue={property.resident_fee} required />
+                        </span>
                       </label>
                       <label>
                         Resident notes
@@ -215,7 +235,7 @@ export default async function AdminPage() {
                           <th>Unit</th>
                           <th>Phone</th>
                           <th>Done</th>
-                          <th>Paid ack.</th>
+                          <th>Payment Ack.</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -292,6 +312,40 @@ export default async function AdminPage() {
         </div>
 
         <aside className="admin-stack">
+          <section className="admin-panel property-nav-panel">
+            <h2>Properties</h2>
+            <PropertyFilter />
+            <div className="property-nav-list">
+              {properties.length > 0 ? (
+                properties.map((property) => {
+                  const propertySubmissions = submissionsByProperty.get(property.id) || [];
+                  const currentServiceKey = property.next_service_date || "unscheduled";
+                  const currentCount = propertySubmissions.filter(
+                    (submission) => (submission.service_date || "unscheduled") === currentServiceKey
+                  ).length;
+                  const propertySearch = `${property.name} ${property.slug} ${property.address || ""}`.toLowerCase();
+
+                  return (
+                    <a
+                      className="property-nav-item"
+                      href={`#property-${property.slug}`}
+                      data-property-nav-item
+                      data-search={propertySearch}
+                      key={property.id}
+                    >
+                      <span>{property.name}</span>
+                      <small>
+                        {currentCount} signup{currentCount === 1 ? "" : "s"} - {formatHawaiiDate(property.next_service_date)}
+                      </small>
+                    </a>
+                  );
+                })
+              ) : (
+                <p>No properties yet.</p>
+              )}
+            </div>
+          </section>
+
           <section className="admin-panel">
             <h2>Add property</h2>
             <form className="admin-form" action="/api/admin/properties" method="post">
@@ -309,7 +363,7 @@ export default async function AdminPage() {
               </label>
               <label>
                 Service schedule
-                <input name="service_schedule" type="text" defaultValue="Each 3rd Thursday of the Month" required />
+                <input name="service_schedule" type="text" placeholder="Each 3rd Thursday of the Month" required />
               </label>
               <label>
                 Next service date
@@ -321,7 +375,10 @@ export default async function AdminPage() {
               </label>
               <label>
                 Resident fee
-                <input name="resident_fee" type="number" min="0" step="0.01" defaultValue="40" required />
+                <span className="money-input">
+                  <span>$</span>
+                  <input name="resident_fee" type="number" min="0" step="0.01" defaultValue="40" required />
+                </span>
               </label>
               <label>
                 Resident notes

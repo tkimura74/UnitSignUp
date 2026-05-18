@@ -66,11 +66,12 @@ export default function TechnicianList({ property, submissions, token }) {
 
       <section className="tech-list">
         {items.length > 0 ? (
-          items.map((submission) => (
+          items.map((submission, index) => (
             <article
               className={`tech-unit ${submission.technician_completed ? "is-complete" : ""}`}
               key={submission.id}
             >
+              <span className="route-order">#{index + 1}</span>
               <label className="tech-check">
                 <input
                   type="checkbox"

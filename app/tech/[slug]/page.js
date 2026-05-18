@@ -1,12 +1,6 @@
 import { supabaseAdminFetch } from "../../../lib/supabase-admin";
 import TechnicianList from "./technician-list";
 
-function unitSortValue(unitNumber) {
-  const text = String(unitNumber || "");
-  const number = text.match(/\d+/)?.[0];
-  return number ? Number(number) : Number.MAX_SAFE_INTEGER;
-}
-
 async function getTechnicianData(slug, token) {
   if (!token) {
     return { error: "Technician link is missing its access token." };
@@ -25,14 +19,8 @@ async function getTechnicianData(slug, token) {
     ? `&service_date=eq.${encodeURIComponent(property.next_service_date)}`
     : "&service_date=is.null";
   const submissions = await supabaseAdminFetch(
-    `submissions?select=id,service_date,created_at,resident_name,unit_number,phone_number,payment_acknowledged,technician_completed,technician_notes&property_id=eq.${encodeURIComponent(property.id)}${serviceDateFilter}&order=unit_number.asc`
+    `submissions?select=id,service_date,created_at,resident_name,unit_number,phone_number,payment_acknowledged,technician_completed,technician_notes&property_id=eq.${encodeURIComponent(property.id)}${serviceDateFilter}&order=created_at.asc`
   );
-
-  submissions.sort((a, b) => {
-    const unitDifference = unitSortValue(a.unit_number) - unitSortValue(b.unit_number);
-    if (unitDifference !== 0) return unitDifference;
-    return String(a.unit_number || "").localeCompare(String(b.unit_number || ""));
-  });
 
   return { property, submissions };
 }
