@@ -1,15 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-function formatDate(dateValue) {
-  if (!dateValue) return "Not set";
-  return new Date(`${dateValue}T00:00:00`).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  });
-}
+import { formatHawaiiDate } from "../../../lib/date-format";
 
 export default function TechnicianList({ property, submissions, token }) {
   const [items, setItems] = useState(submissions);
@@ -60,7 +52,7 @@ export default function TechnicianList({ property, submissions, token }) {
       <section className="tech-summary">
         <div>
           <span>Service date</span>
-          <strong>{formatDate(property.next_service_date)}</strong>
+          <strong>{formatHawaiiDate(property.next_service_date)}</strong>
         </div>
         <div>
           <span>Units</span>

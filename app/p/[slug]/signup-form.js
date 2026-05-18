@@ -2,6 +2,7 @@
 
 import Script from "next/script";
 import { useEffect, useMemo, useState } from "react";
+import { formatHawaiiDate } from "../../../lib/date-format";
 
 export default function SignupForm({ property }) {
   const [status, setStatus] = useState("idle");
@@ -99,13 +100,7 @@ export default function SignupForm({ property }) {
           {property.next_service_date ? (
             <p className="next-date">
               Next service date:{" "}
-              <strong>
-                {new Date(`${property.next_service_date}T00:00:00`).toLocaleDateString(undefined, {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric"
-                })}
-              </strong>
+              <strong>{formatHawaiiDate(property.next_service_date)}</strong>
             </p>
           ) : null}
           {!property.next_service_date ? (

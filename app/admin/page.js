@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import DeletePropertyForm from "./components/delete-property-form";
 import { isAdminAuthenticated } from "../../lib/admin-auth";
+import { formatHawaiiDate, formatHawaiiDateTime } from "../../lib/date-format";
 import { hasAdminSupabaseConfig, supabaseAdminFetch } from "../../lib/supabase-admin";
 
 async function getAdminData() {
@@ -35,15 +37,6 @@ async function getAdminData() {
   ]);
 
   return { properties, submissions };
-}
-
-function formatDate(dateValue) {
-  if (!dateValue) return "Not set";
-  return new Date(`${dateValue}T00:00:00`).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  });
 }
 
 export default async function AdminPage() {
@@ -113,7 +106,7 @@ export default async function AdminPage() {
               const technicianUrl = `${baseUrl}/tech/${property.slug}?token=${property.technician_token}`;
               const technicianEmailSubject = encodeURIComponent(`${property.name} route sheet`);
               const technicianEmailBody = encodeURIComponent(
-                `Here is the route sheet for ${property.name}.\n\nService date: ${formatDate(property.next_service_date)}\n\nOpen route sheet:\n${technicianUrl}`
+                `Here is the route sheet for ${property.name}.\n\nService date: ${formatHawaiiDate(property.next_service_date)}\n\nOpen route sheet:\n${technicianUrl}`
               );
 
               return (
@@ -142,7 +135,7 @@ export default async function AdminPage() {
                   <div className="service-summary">
                     <div>
                       <span>Next service date</span>
-                      <strong>{formatDate(property.next_service_date)}</strong>
+                      <strong>{formatHawaiiDate(property.next_service_date)}</strong>
                     </div>
                     <div>
                       <span>Schedule</span>
@@ -210,12 +203,7 @@ export default async function AdminPage() {
                       </label>
                       <button className="submit-button" type="submit">Save property</button>
                     </form>
-                    <form action={`/api/admin/properties/${property.id}`} method="post">
-                      <input type="hidden" name="_action" value="delete" />
-                      <button className="danger-button" type="submit">
-                        Delete property and its submissions
-                      </button>
-                    </form>
+                    <DeletePropertyForm propertyId={property.id} propertyName={property.name} />
                   </details>
 
                   <div className="table-wrap">
@@ -234,7 +222,7 @@ export default async function AdminPage() {
                         {currentSubmissions.length > 0 ? (
                           currentSubmissions.map((submission) => (
                             <tr key={submission.id}>
-                              <td>{new Date(submission.created_at).toLocaleString()}</td>
+                              <td>{formatHawaiiDateTime(submission.created_at)}</td>
                               <td>{submission.resident_name}</td>
                               <td>{submission.unit_number}</td>
                               <td>{submission.phone_number}</td>
@@ -256,7 +244,7 @@ export default async function AdminPage() {
                     {[...historyGroups.entries()].map(([serviceDate, serviceSubmissions]) => (
                       <div className="history-group" key={serviceDate}>
                         <div className="panel-heading-row">
-                          <h3>{serviceDate === "Unscheduled" ? "Unscheduled" : formatDate(serviceDate)}</h3>
+                          <h3>{serviceDate === "Unscheduled" ? "Unscheduled" : formatHawaiiDate(serviceDate)}</h3>
                           <a
                             className="secondary-button"
                             href={`/api/admin/export?property=${property.slug}&serviceDate=${encodeURIComponent(serviceDate)}`}
@@ -279,7 +267,7 @@ export default async function AdminPage() {
                             <tbody>
                               {serviceSubmissions.map((submission) => (
                                 <tr key={submission.id}>
-                                  <td>{new Date(submission.created_at).toLocaleString()}</td>
+                                  <td>{formatHawaiiDateTime(submission.created_at)}</td>
                                   <td>{submission.resident_name}</td>
                                   <td>{submission.unit_number}</td>
                                   <td>{submission.phone_number}</td>

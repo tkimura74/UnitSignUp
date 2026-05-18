@@ -12,7 +12,7 @@ async function fetchProperty(slug) {
   }
 
   const response = await fetch(
-    `${supabaseUrl}/rest/v1/properties?slug=eq.${encodeURIComponent(slug)}&is_active=eq.true&select=*`,
+    `${supabaseUrl}/rest/v1/properties?slug=eq.${encodeURIComponent(slug)}&select=*`,
     {
       headers: {
         apikey: supabaseAnonKey,
@@ -31,15 +31,39 @@ async function fetchProperty(slug) {
   }
 
   const properties = await response.json();
+  const property = properties[0];
+
+  if (property && !property.is_active) {
+    return {
+      inactiveProperty: property,
+      details: "This signup page is currently closed."
+    };
+  }
+
   return {
-    property: properties[0],
-    details: properties.length === 0 ? `No active property found for slug "${slug}".` : ""
+    property,
+    details: properties.length === 0 ? `No property found for slug "${slug}".` : ""
   };
 }
 
 export default async function PropertySignupPage({ params }) {
   const resolvedParams = await params;
-  const { property, error, details } = await fetchProperty(resolvedParams.slug);
+  const { property, inactiveProperty, error, details } = await fetchProperty(resolvedParams.slug);
+
+  if (inactiveProperty) {
+    return (
+      <main className="simple-page">
+        <section className="simple-panel">
+          <p className="card-label">Signup closed</p>
+          <h1>{inactiveProperty.name} is not accepting signups right now.</h1>
+          <p>
+            This signup page may reopen for a future service visit. Please contact property
+            management if you believe this is a mistake.
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   if (error || !property) {
     return (

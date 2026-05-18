@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Resident Interior Service Signup</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero__overlay"></div>
+        <div class="hero__content">
+          <p class="eyebrow">Next exterior service visit</p>
+          <h1 id="page-title">Add your unit for same-day interior treatment.</h1>
+          <p class="hero__copy">
+            While your Orkin Pro is on property for exterior treatments, residents can sign up
+            for interior unit treatment during that same visit.
+          </p>
+        </div>
+      </section>
+
+      <section class="content-grid" aria-label="Signup details">
+        <aside class="visit-card">
+          <p class="card-label">Upcoming visit</p>
+          <h2>Each 3rd Thursday of the Month</h2>
+          <div class="visit-meta">
+            <div>
+              <span>Date</span>
+              <strong>To be confirmed by property management</strong>
+            </div>
+            <div>
+              <span>Resident fee</span>
+              <strong>$40 cash or check</strong>
+            </div>
+            <div>
+              <span>Payable to</span>
+              <strong>ORKIN</strong>
+            </div>
+          </div>
+          <p class="note">
+            Please be available by phone in case the technician or property team needs to coordinate access.
+          </p>
+        </aside>
+
+        <section class="signup-panel" aria-labelledby="form-title">
+          <div class="panel-heading">
+            <p class="card-label">Resident request</p>
+            <h2 id="form-title">Interior Unit General Pest Control treatment.</h2>
+          </div>
+
+          <form id="signup-form" novalidate>
+            <div class="field-group">
+              <label for="resident-name">Resident name</label>
+              <input id="resident-name" name="residentName" type="text" autocomplete="name" required>
+              <p class="error-message">Enter the resident name.</p>
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label for="unit-number">Unit number</label>
+                <input id="unit-number" name="unitNumber" type="text" autocomplete="address-line2" required>
+                <p class="error-message">Enter the unit number.</p>
+              </div>
+
+              <div class="field-group">
+                <label for="phone-number">Phone number</label>
+                <input id="phone-number" name="phoneNumber" type="tel" autocomplete="tel" inputmode="tel" required>
+                <p class="error-message">Enter a phone number.</p>
+              </div>
+            </div>
+
+            <label class="agreement" for="payment-agreement">
+              <input id="payment-agreement" name="paymentAgreement" type="checkbox" required>
+              <span>
+                I agree to pay <strong>$40 by cash or check payable to ORKIN</strong>
+                at the time of service.
+              </span>
+            </label>
+            <p class="error-message agreement-error">Payment acknowledgment is required.</p>
+
+            <button class="submit-button" type="submit">Reserve my unit</button>
+          </form>
+
+          <div class="confirmation" id="confirmation" hidden aria-live="polite">
+            <p class="card-label">Request received</p>
+            <h2>You're on the list for the next visit.</h2>
+            <p id="confirmation-copy"></p>
+            <button class="secondary-button" type="button" id="reset-form">Submit another unit</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
