@@ -480,6 +480,21 @@ textarea:focus {
   background: #fff1f1;
 }
 
+.site-footer {
+  width: min(1120px, calc(100% - 40px));
+  margin: -34px auto 56px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.site-footer p {
+  max-width: 860px;
+  margin: 0;
+}
+
 .secondary-button {
   color: var(--accent-strong);
   background: #fff;

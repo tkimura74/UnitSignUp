@@ -243,7 +243,7 @@ export default function SignupForm({ property }) {
         </section>
       </section>
 
-      <section className="service-info" aria-labelledby="service-info-title">
+      <section className="service-info" id="about-service" aria-labelledby="service-info-title">
         <div className="service-info__inner">
           <div className="service-info__intro">
             <p className="card-label">About the service</p>
@@ -323,6 +323,14 @@ export default function SignupForm({ property }) {
           </div>
         </div>
       </section>
+
+      <footer className="site-footer">
+        <p>
+          Resident information submitted through this page is used to coordinate requested service
+          for {property.name}. Service availability, pricing, and treatment recommendations may vary
+          by property, unit condition, and technician assessment.
+        </p>
+      </footer>
     </main>
   );
 }
