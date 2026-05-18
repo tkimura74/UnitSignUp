@@ -1,13 +1,27 @@
 import SignupForm from "./signup-form";
+import { hasAdminSupabaseConfig, supabaseAdminFetch } from "../../../lib/supabase-admin";
 
 async function fetchProperty(slug) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  if (hasAdminSupabaseConfig()) {
+    const properties = await supabaseAdminFetch(
+      `properties?slug=eq.${encodeURIComponent(slug)}&select=*&limit=1`
+    );
+    const property = properties[0];
+
+    return {
+      property: property?.is_active ? property : null,
+      inactiveProperty: property && !property.is_active ? property : null,
+      details: property ? "" : `No property found for slug "${slug}".`
+    };
+  }
+
   if (!supabaseUrl || !supabaseAnonKey) {
     return {
       error: "Supabase environment variables are not configured yet.",
-      details: `URL visible: ${supabaseUrl ? "yes" : "no"}. Key visible: ${supabaseAnonKey ? "yes" : "no"}.`
+      details: "Check the Supabase setup, then try again."
     };
   }
 

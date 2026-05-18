@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 import { useEffect, useMemo, useState } from "react";
-import { formatHawaiiDate } from "../../../lib/date-format";
+import { formatHawaiiDate, formatHawaiiDateTime } from "../../../lib/date-format";
 
 export default function SignupForm({ property }) {
   const [status, setStatus] = useState("idle");
@@ -42,6 +42,7 @@ export default function SignupForm({ property }) {
     );
     return `mailto:Branch801@rollins.com?subject=${subject}&body=${body}`;
   }, [property.name]);
+  const lastUpdated = property.updated_at || property.created_at;
 
   function updateField(event) {
     const { name, value, checked, type } = event.target;
@@ -81,7 +82,7 @@ export default function SignupForm({ property }) {
 
     setStatus("success");
     setMessage(
-      `${formData.residentName.trim()} in unit ${formData.unitNumber.trim()} has been added for ${property.name}. Please have ${fee} cash or check payable to ${property.payable_to} ready at the time of service.`
+      `${formData.residentName.trim()} in unit ${formData.unitNumber.trim()} has been added for ${property.name}. You do not need to submit again unless your information changes. Please make sure your unit can be accessed during the scheduled service window and have ${fee} cash or check payable to ${property.payable_to} ready at the time of service.`
     );
   }
 
@@ -104,14 +105,14 @@ export default function SignupForm({ property }) {
         <aside className="visit-card">
           <p className="card-label">Upcoming visit</p>
           <h2>{property.service_schedule}</h2>
-          {property.next_service_date ? (
-            <p className="next-date">
-              Next service date:{" "}
-              <strong>{formatHawaiiDate(property.next_service_date)}</strong>
-            </p>
-          ) : null}
-          {!property.next_service_date ? (
-            <p className="next-date next-date--pending">Next service date: To be confirmed</p>
+          <div className={`visit-highlight ${property.next_service_date ? "" : "visit-highlight--pending"}`}>
+            <span>Next service date</span>
+            <strong>
+              {property.next_service_date ? formatHawaiiDate(property.next_service_date) : "To be confirmed"}
+            </strong>
+          </div>
+          {lastUpdated ? (
+            <p className="last-updated">Last updated: {formatHawaiiDateTime(lastUpdated)}</p>
           ) : null}
           <dl className="visit-meta">
             <div className="visit-row">
@@ -134,6 +135,9 @@ export default function SignupForm({ property }) {
             </div>
           </dl>
           <p className="note">{property.notes}</p>
+          <p className="access-note">
+            Please make sure your unit can be accessed during the scheduled service window.
+          </p>
         </aside>
 
         <section className="signup-panel" aria-labelledby="form-title">
@@ -327,8 +331,9 @@ export default function SignupForm({ property }) {
       <footer className="site-footer">
         <p>
           Resident information submitted through this page is used to coordinate requested service
-          for {property.name}. Service availability, pricing, and treatment recommendations may vary
-          by property, unit condition, and technician assessment.
+          for {property.name}. Your information may be shared with the property team or technician
+          as needed to complete the visit. Service availability, pricing, and treatment
+          recommendations may vary by property, unit condition, and technician assessment.
         </p>
       </footer>
     </main>

@@ -11,7 +11,8 @@ create table if not exists public.properties (
   payable_to text not null default 'ORKIN LLC',
   notes text,
   is_active boolean not null default true,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists public.submissions (
@@ -39,6 +40,7 @@ grant all privileges on public.submissions to service_role;
 
 alter table public.properties add column if not exists next_service_date date;
 alter table public.properties add column if not exists next_service_note text;
+alter table public.properties add column if not exists updated_at timestamptz not null default now();
 alter table public.properties add column if not exists technician_token text;
 update public.properties
 set technician_token = gen_random_uuid()::text

@@ -4,7 +4,12 @@ import { supabaseAdminFetch } from "../../../../../lib/supabase-admin";
 export async function POST(request, { params }) {
   const resolvedParams = await params;
   const submissionId = resolvedParams.id;
-  const payload = await request.json();
+  const payload = await request.json().catch(() => null);
+
+  if (!payload) {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
+
   const token = String(payload.token || "");
 
   if (!token) {
@@ -25,7 +30,7 @@ export async function POST(request, { params }) {
     headers: { Prefer: "return=minimal" },
     body: JSON.stringify({
       technician_completed: Boolean(payload.completed),
-      technician_notes: String(payload.notes || "").trim()
+      technician_notes: String(payload.notes || "").trim().slice(0, 500)
     })
   });
 

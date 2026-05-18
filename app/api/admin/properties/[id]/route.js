@@ -35,6 +35,14 @@ export async function POST(request, { params }) {
     return NextResponse.redirect(new URL("/admin?error=property-required", request.url));
   }
 
+  const existingProperties = await supabaseAdminFetch(
+    `properties?select=id&slug=eq.${encodeURIComponent(slug)}&id=neq.${encodeURIComponent(propertyId)}&limit=1`
+  );
+
+  if (existingProperties.length > 0) {
+    return NextResponse.redirect(new URL(`/admin?error=duplicate-slug&slug=${encodeURIComponent(slug)}`, request.url));
+  }
+
   await supabaseAdminFetch(`properties?id=eq.${encodeURIComponent(propertyId)}`, {
     method: "PATCH",
     headers: { Prefer: "return=minimal" },
@@ -48,7 +56,8 @@ export async function POST(request, { params }) {
       resident_fee: Number(formData.get("resident_fee") || 40),
       payable_to: "ORKIN LLC",
       notes: String(formData.get("notes") || "").trim(),
-      is_active: formData.get("is_active") === "on"
+      is_active: formData.get("is_active") === "on",
+      updated_at: new Date().toISOString()
     })
   });
 

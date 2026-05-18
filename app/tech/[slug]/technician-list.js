@@ -6,6 +6,7 @@ import { formatHawaiiDate } from "../../../lib/date-format";
 export default function TechnicianList({ property, submissions, token }) {
   const [items, setItems] = useState(submissions);
   const [savingId, setSavingId] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   const completedCount = useMemo(
     () => items.filter((item) => item.technician_completed).length,
@@ -14,6 +15,7 @@ export default function TechnicianList({ property, submissions, token }) {
 
   async function updateSubmission(id, updates) {
     setSavingId(id);
+    setSaveError("");
     setItems((current) =>
       current.map((item) => (item.id === id ? { ...item, ...updates } : item))
     );
@@ -35,7 +37,7 @@ export default function TechnicianList({ property, submissions, token }) {
       setItems((current) =>
         current.map((item) => (item.id === id ? currentItem : item))
       );
-      alert("Unable to save this update. Please try again.");
+      setSaveError("Unable to save this update. Please try again.");
     }
 
     setSavingId("");
@@ -63,6 +65,8 @@ export default function TechnicianList({ property, submissions, token }) {
           <strong>${Number(property.resident_fee || 40).toFixed(2)} to {property.payable_to}</strong>
         </div>
       </section>
+
+      {saveError ? <p className="tech-error">{saveError}</p> : null}
 
       <section className="tech-list">
         {items.length > 0 ? (

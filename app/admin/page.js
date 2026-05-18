@@ -41,11 +41,14 @@ async function getAdminData() {
   return { properties, submissions };
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }) {
   if (!(await isAdminAuthenticated())) {
     redirect("/admin/login");
   }
 
+  const resolvedSearchParams = await searchParams;
+  const adminError = resolvedSearchParams?.error;
+  const duplicateSlug = resolvedSearchParams?.slug;
   const requestHeaders = await headers();
   const host = requestHeaders.get("host") || "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
@@ -76,6 +79,22 @@ export default async function AdminPage() {
         <section className="admin-panel">
           <h2>Finish admin setup</h2>
           <p>{setupError}</p>
+        </section>
+      ) : null}
+
+      {adminError === "duplicate-slug" ? (
+        <section className="admin-alert">
+          <strong>That property link is already in use.</strong>
+          <span>
+            Choose a different link slug{duplicateSlug ? ` than "${duplicateSlug}"` : ""}, then try again.
+          </span>
+        </section>
+      ) : null}
+
+      {adminError === "property-required" ? (
+        <section className="admin-alert">
+          <strong>Property name and link slug are required.</strong>
+          <span>Add both fields before saving the property.</span>
         </section>
       ) : null}
 

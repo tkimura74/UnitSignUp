@@ -7,12 +7,6 @@ function csvValue(value) {
   return `"${text.replace(/"/g, '""')}"`;
 }
 
-function unitSortValue(unitNumber) {
-  const text = String(unitNumber || "");
-  const number = text.match(/\d+/)?.[0];
-  return number ? Number(number) : Number.MAX_SAFE_INTEGER;
-}
-
 export async function GET(request) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.redirect(new URL("/admin/login", request.url));
@@ -36,11 +30,9 @@ export async function GET(request) {
   let filename = `${propertySlug || "all"}-resident-submissions.csv`;
 
   if (exportType === "technician") {
-    const sortedSubmissions = [...submissions].sort((a, b) => {
-      const unitDifference = unitSortValue(a.unit_number) - unitSortValue(b.unit_number);
-      if (unitDifference !== 0) return unitDifference;
-      return String(a.unit_number || "").localeCompare(String(b.unit_number || ""));
-    });
+    const sortedSubmissions = [...submissions].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
 
     rows = [
       [

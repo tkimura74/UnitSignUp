@@ -172,14 +172,45 @@ body {
   letter-spacing: 0;
 }
 
-.next-date {
-  margin: 16px 0 0;
-  color: var(--accent-strong);
-  line-height: 1.45;
+.visit-highlight {
+  margin: 20px 0 0;
+  padding: 18px;
+  border-radius: 8px;
+  color: #fff;
+  background: var(--accent);
+  box-shadow: 0 16px 36px rgba(215, 25, 32, 0.18);
 }
 
-.next-date--pending {
+.visit-highlight span {
+  display: block;
+  margin-bottom: 5px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.visit-highlight strong {
+  display: block;
+  font-size: clamp(1.45rem, 3vw, 2.15rem);
+  line-height: 1.08;
+}
+
+.visit-highlight--pending {
+  color: var(--ink);
+  background: #fff7f7;
+  border: 1px solid #e5b3b5;
+  box-shadow: none;
+}
+
+.visit-highlight--pending span {
   color: var(--muted);
+}
+
+.last-updated {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
 }
 
 .visit-meta {
@@ -213,6 +244,16 @@ body {
   margin: 0;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.access-note {
+  margin: 18px 0 0;
+  padding: 14px;
+  border-left: 4px solid var(--accent);
+  color: var(--ink);
+  background: #fff7f7;
+  line-height: 1.5;
+  font-weight: 700;
 }
 
 .signup-panel {
@@ -579,6 +620,21 @@ textarea:focus {
   line-height: 1.55;
 }
 
+.admin-alert {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 22px;
+  padding: 16px 18px;
+  border: 1px solid #e5b3b5;
+  border-radius: 8px;
+  color: var(--accent-strong);
+  background: #fff1f1;
+}
+
+.admin-alert span {
+  color: var(--muted);
+}
+
 .admin-form {
   display: grid;
   gap: 14px;
@@ -889,6 +945,17 @@ th {
   display: grid;
   gap: 12px;
   padding-bottom: 40px;
+}
+
+.tech-error {
+  width: min(760px, 100%);
+  margin: 0 auto 12px;
+  padding: 12px 14px;
+  border: 1px solid #e5b3b5;
+  border-radius: 8px;
+  color: var(--accent-strong);
+  background: #fff1f1;
+  font-weight: 700;
 }
 
 .tech-unit {

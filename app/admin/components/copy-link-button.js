@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function CopyLinkButton({ value }) {
   const [copied, setCopied] = useState(false);
+  const resetTimer = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimer.current) {
+        window.clearTimeout(resetTimer.current);
+      }
+    };
+  }, []);
 
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
+      if (resetTimer.current) {
+        window.clearTimeout(resetTimer.current);
+      }
+      resetTimer.current = window.setTimeout(() => setCopied(false), 1800);
     } catch {
       setCopied(false);
       window.prompt("Copy this link", value);

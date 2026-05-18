@@ -17,10 +17,15 @@ async function verifyTurnstile(token, request) {
   const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
     method: "POST",
     body: formData
-  });
-  const result = await response.json();
+  }).catch(() => null);
 
-  if (!result.success) {
+  if (!response) {
+    return { ok: false, message: "Verification could not be completed. Please try again." };
+  }
+
+  const result = await response.json().catch(() => null);
+
+  if (!result?.success) {
     return { ok: false, message: "Verification failed. Please try again." };
   }
 
@@ -28,7 +33,11 @@ async function verifyTurnstile(token, request) {
 }
 
 export async function POST(request) {
-  const payload = await request.json();
+  const payload = await request.json().catch(() => null);
+
+  if (!payload) {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
 
   if (String(payload.companyName || "").trim()) {
     return NextResponse.json({ error: "Unable to save this request." }, { status: 400 });
@@ -56,6 +65,13 @@ export async function POST(request) {
     return NextResponse.json({ error: "Enter a valid phone number." }, { status: 400 });
   }
 
+  const residentName = String(payload.residentName).trim();
+  const unitNumber = String(payload.unitNumber).trim();
+
+  if (residentName.length > 120 || unitNumber.length > 40 || phoneNumber.length > 30) {
+    return NextResponse.json({ error: "One or more fields are too long." }, { status: 400 });
+  }
+
   const properties = await supabaseAdminFetch(
     `properties?select=id,next_service_date&id=eq.${encodeURIComponent(payload.propertyId)}&is_active=eq.true&limit=1`
   );
@@ -71,8 +87,8 @@ export async function POST(request) {
     body: JSON.stringify({
       property_id: payload.propertyId,
       service_date: property.next_service_date || null,
-      resident_name: String(payload.residentName).trim(),
-      unit_number: String(payload.unitNumber).trim(),
+      resident_name: residentName,
+      unit_number: unitNumber,
       phone_number: phoneNumber,
       payment_acknowledged: Boolean(payload.paymentAcknowledged)
     })
