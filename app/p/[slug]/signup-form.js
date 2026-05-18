@@ -35,6 +35,13 @@ export default function SignupForm({ property }) {
       minimumFractionDigits: Number.isInteger(amount) ? 0 : 2
     }).format(amount);
   }, [property.resident_fee]);
+  const additionalServicesMailto = useMemo(() => {
+    const subject = encodeURIComponent(`Additional Pest Service Consultation - ${property.name}`);
+    const body = encodeURIComponent(
+      `Hello,\n\nI am interested in additional pest services for ${property.name}.\n\nPlease contact me with more information.\n`
+    );
+    return `mailto:Branch801@rollins.com?subject=${subject}&body=${body}`;
+  }, [property.name]);
 
   function updateField(event) {
     const { name, value, checked, type } = event.target;
@@ -234,6 +241,87 @@ export default function SignupForm({ property }) {
             </form>
           )}
         </section>
+      </section>
+
+      <section className="service-info" aria-labelledby="service-info-title">
+        <div className="service-info__inner">
+          <div className="service-info__intro">
+            <p className="card-label">About the service</p>
+            <h2 id="service-info-title">Interior protection while your Orkin Pro is already on site.</h2>
+            <p>
+              This same-day add-on gives your unit an interior general pest control treatment
+              during the property's scheduled exterior service visit. Your technician applies a
+              liquid residual barrier in targeted interior areas to help protect the living space
+              from common crawling pests, with cabinet-area bait applied when conditions call for it.
+            </p>
+          </div>
+
+          <div className="service-benefits" aria-label="Service benefits">
+            <article>
+              <span>1</span>
+              <h3>Residual barrier</h3>
+              <p>
+                A targeted liquid treatment is applied to key interior areas where pests commonly
+                travel or enter.
+              </p>
+            </article>
+            <article>
+              <span>2</span>
+              <h3>Convenient timing</h3>
+              <p>
+                Request service for the same visit while the technician is already treating the
+                exterior of the property.
+              </p>
+            </article>
+            <article>
+              <span>3</span>
+              <h3>Common pest coverage</h3>
+              <p>
+                Helps protect against ants, roaches, spiders, centipedes, and other common
+                household pests.
+              </p>
+            </article>
+          </div>
+
+          <div className="pest-strip" aria-label="Common pests covered">
+            <span>Ants</span>
+            <span>Roaches</span>
+            <span>Spiders</span>
+            <span>Centipedes</span>
+          </div>
+
+          <div className="additional-services">
+            <div>
+              <p className="card-label">Additional services</p>
+              <h2>Need help with a larger pest concern?</h2>
+              <p>
+                For issues that may need a dedicated inspection or specialty treatment, ask about
+                bed bug service and intensive roach cleanout service.
+              </p>
+            </div>
+            <a
+              className="secondary-button compact-button"
+              href={additionalServicesMailto}
+            >
+              Ask about services
+            </a>
+          </div>
+
+          <div className="termite-callout">
+            <div>
+              <p className="card-label">Free termite inspection</p>
+              <h2>Protect more than your unit. Protect your home investment.</h2>
+              <p>
+                Termite activity is easier to address when it is found early. If you have noticed
+                soft wood, mud tubes, discarded wings, bubbling paint, or unexplained damage, ask
+                about scheduling a free residential termite inspection.
+              </p>
+            </div>
+            <a className="submit-button compact-button" href="tel:8083540869">
+              Call (808) 354-0869
+            </a>
+          </div>
+        </div>
       </section>
     </main>
   );
