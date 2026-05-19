@@ -11,6 +11,29 @@ function slugify(value) {
     .replace(/^-+|-+$/g, "");
 }
 
+async function insertProperty(body) {
+  try {
+    await supabaseAdminFetch("properties", {
+      method: "POST",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify(body)
+    });
+    return false;
+  } catch (error) {
+    if (!String(error?.message || error).includes("updated_at")) {
+      throw error;
+    }
+
+    const { updated_at, ...fallbackBody } = body;
+    await supabaseAdminFetch("properties", {
+      method: "POST",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify(fallbackBody)
+    });
+    return true;
+  }
+}
+
 export async function POST(request) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -32,24 +55,20 @@ export async function POST(request) {
     return NextResponse.redirect(new URL(`/admin?error=duplicate-slug&slug=${encodeURIComponent(slug)}`, request.url));
   }
 
-  await supabaseAdminFetch("properties", {
-    method: "POST",
-    headers: { Prefer: "return=minimal" },
-    body: JSON.stringify({
-      slug,
-      name,
-      address: String(formData.get("address") || "").trim(),
-      service_schedule: String(formData.get("service_schedule") || "Each 3rd Thursday of the Month").trim(),
-      next_service_date: String(formData.get("next_service_date") || "") || null,
-      next_service_note: String(formData.get("next_service_note") || "").trim(),
-      technician_token: randomUUID(),
-      resident_fee: Number(formData.get("resident_fee") || 40),
-      payable_to: "ORKIN LLC",
-      notes: String(formData.get("notes") || "").trim(),
-      is_active: formData.get("is_active") === "on",
-      updated_at: new Date().toISOString()
-    })
+  const usedSchemaFallback = await insertProperty({
+    slug,
+    name,
+    address: String(formData.get("address") || "").trim(),
+    service_schedule: String(formData.get("service_schedule") || "Each 3rd Thursday of the Month").trim(),
+    next_service_date: String(formData.get("next_service_date") || "") || null,
+    next_service_note: String(formData.get("next_service_note") || "").trim(),
+    technician_token: randomUUID(),
+    resident_fee: Number(formData.get("resident_fee") || 40),
+    payable_to: "ORKIN LLC",
+    notes: String(formData.get("notes") || "").trim(),
+    is_active: formData.get("is_active") === "on",
+    updated_at: new Date().toISOString()
   });
 
-  return NextResponse.redirect(new URL("/admin?created=1", request.url));
+  return NextResponse.redirect(new URL(`/admin?created=1${usedSchemaFallback ? "&warning=run-schema" : ""}`, request.url));
 }

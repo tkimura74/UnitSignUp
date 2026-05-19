@@ -48,6 +48,7 @@ export default async function AdminPage({ searchParams }) {
 
   const resolvedSearchParams = await searchParams;
   const adminError = resolvedSearchParams?.error;
+  const adminWarning = resolvedSearchParams?.warning;
   const duplicateSlug = resolvedSearchParams?.slug;
   const requestHeaders = await headers();
   const host = requestHeaders.get("host") || "localhost:3000";
@@ -95,6 +96,13 @@ export default async function AdminPage({ searchParams }) {
         <section className="admin-alert">
           <strong>Property name and link slug are required.</strong>
           <span>Add both fields before saving the property.</span>
+        </section>
+      ) : null}
+
+      {adminWarning === "run-schema" ? (
+        <section className="admin-alert">
+          <strong>Property saved, but the database schema needs updating.</strong>
+          <span>Run the latest supabase/schema.sql so the Last updated field can work correctly.</span>
         </section>
       ) : null}
 
