@@ -793,6 +793,18 @@ th {
   text-transform: uppercase;
 }
 
+.table-action-form {
+  display: block;
+}
+
+.table-button {
+  width: auto;
+  min-height: 34px;
+  margin: 0;
+  padding: 0 12px;
+  font-size: 0.86rem;
+}
+
 .property-list {
   display: grid;
   gap: 12px;

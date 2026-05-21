@@ -10,6 +10,7 @@ Before connecting a production domain:
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `SUPABASE_SERVICE_ROLE_KEY`
   - `ADMIN_PASSWORD`
+  - `SUPER_ADMIN_PASSWORD`
   - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
   - `TURNSTILE_SECRET_KEY`
 - Add the Vercel production hostname and any custom domain to Cloudflare Turnstile.

@@ -3,14 +3,14 @@ import { headers } from "next/headers";
 import CopyLinkButton from "./components/copy-link-button";
 import DeletePropertyForm from "./components/delete-property-form";
 import PropertyFilter from "./components/property-filter";
-import { isAdminAuthenticated } from "../../lib/admin-auth";
+import { getAdminRole, isAdminAuthenticated } from "../../lib/admin-auth";
 import { formatHawaiiDate, formatHawaiiDateTime } from "../../lib/date-format";
 import { hasAdminSupabaseConfig, supabaseAdminFetch } from "../../lib/supabase-admin";
 
 async function getAdminData() {
   if (!hasAdminSupabaseConfig()) {
     return {
-      setupError: "Add SUPABASE_SERVICE_ROLE_KEY and ADMIN_PASSWORD to .env.local, then restart the dev server.",
+      setupError: "Add SUPABASE_SERVICE_ROLE_KEY and an admin password to .env.local, then restart the dev server.",
       properties: [],
       submissions: []
     };
@@ -46,6 +46,8 @@ export default async function AdminPage({ searchParams }) {
     redirect("/admin/login");
   }
 
+  const adminRole = await getAdminRole();
+  const canRemoveTenants = adminRole === "super";
   const resolvedSearchParams = await searchParams;
   const adminError = resolvedSearchParams?.error;
   const adminWarning = resolvedSearchParams?.warning;
@@ -103,6 +105,13 @@ export default async function AdminPage({ searchParams }) {
         <section className="admin-alert">
           <strong>Property saved, but the database schema needs updating.</strong>
           <span>Run the latest supabase/schema.sql so the Last updated field can work correctly.</span>
+        </section>
+      ) : null}
+
+      {resolvedSearchParams?.removed === "1" ? (
+        <section className="admin-alert">
+          <strong>Resident removed.</strong>
+          <span>The signup list has been updated.</span>
         </section>
       ) : null}
 
@@ -263,6 +272,7 @@ export default async function AdminPage({ searchParams }) {
                           <th>Phone</th>
                           <th>Done</th>
                           <th>Payment Ack.</th>
+                          {canRemoveTenants ? <th>Remove</th> : null}
                         </tr>
                       </thead>
                       <tbody>
@@ -275,11 +285,20 @@ export default async function AdminPage({ searchParams }) {
                               <td>{submission.phone_number}</td>
                               <td>{submission.technician_completed ? "Yes" : "No"}</td>
                               <td>{submission.payment_acknowledged ? "Yes" : "No"}</td>
+                              {canRemoveTenants ? (
+                                <td>
+                                  <form className="table-action-form" action={`/api/admin/submissions/${submission.id}`} method="post">
+                                    <button className="danger-button table-button" type="submit">
+                                      Remove
+                                    </button>
+                                  </form>
+                                </td>
+                              ) : null}
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="6">No current-service submissions for this property yet.</td>
+                            <td colSpan={canRemoveTenants ? 7 : 6}>No current-service submissions for this property yet.</td>
                           </tr>
                         )}
                       </tbody>
@@ -309,6 +328,7 @@ export default async function AdminPage({ searchParams }) {
                                 <th>Phone</th>
                                 <th>Done</th>
                                 <th>Tech notes</th>
+                                {canRemoveTenants ? <th>Remove</th> : null}
                               </tr>
                             </thead>
                             <tbody>
@@ -320,6 +340,15 @@ export default async function AdminPage({ searchParams }) {
                                   <td>{submission.phone_number}</td>
                                   <td>{submission.technician_completed ? "Yes" : "No"}</td>
                                   <td>{submission.technician_notes || ""}</td>
+                                  {canRemoveTenants ? (
+                                    <td>
+                                      <form className="table-action-form" action={`/api/admin/submissions/${submission.id}`} method="post">
+                                        <button className="danger-button table-button" type="submit">
+                                          Remove
+                                        </button>
+                                      </form>
+                                    </td>
+                                  ) : null}
                                 </tr>
                               ))}
                             </tbody>
