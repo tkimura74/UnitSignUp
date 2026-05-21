@@ -8,6 +8,7 @@ create table if not exists public.properties (
   next_service_note text,
   technician_token text not null default gen_random_uuid()::text unique,
   resident_fee numeric(10, 2) not null default 40.00,
+  payment_methods text not null default 'cash_check' check (payment_methods in ('cash', 'check', 'cash_check')),
   payable_to text not null default 'ORKIN LLC',
   notes text,
   is_active boolean not null default true,
@@ -42,6 +43,9 @@ alter table public.properties add column if not exists next_service_date date;
 alter table public.properties add column if not exists next_service_note text;
 alter table public.properties add column if not exists updated_at timestamptz not null default now();
 alter table public.properties add column if not exists technician_token text;
+alter table public.properties add column if not exists payment_methods text not null default 'cash_check';
+alter table public.properties drop constraint if exists properties_payment_methods_check;
+alter table public.properties add constraint properties_payment_methods_check check (payment_methods in ('cash', 'check', 'cash_check'));
 update public.properties
 set technician_token = gen_random_uuid()::text
 where technician_token is null;
@@ -76,6 +80,7 @@ insert into public.properties (
   next_service_date,
   next_service_note,
   resident_fee,
+  payment_methods,
   payable_to,
   notes
 )
@@ -87,6 +92,7 @@ values (
   null,
   'Admin-only note: confirm the upcoming service date with property management before sending the signup link.',
   40.00,
+  'cash_check',
   'ORKIN LLC',
   'Please be available by phone in case the technician or property team needs to coordinate access.'
 )

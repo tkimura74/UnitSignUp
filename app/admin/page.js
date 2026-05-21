@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import AddPropertyModal from "./components/add-property-modal";
 import CopyLinkButton from "./components/copy-link-button";
 import DeletePropertyForm from "./components/delete-property-form";
 import PropertyFilter from "./components/property-filter";
 import { getAdminRole, isAdminAuthenticated } from "../../lib/admin-auth";
 import { formatHawaiiDate, formatHawaiiDateTime } from "../../lib/date-format";
+import { PAYMENT_METHOD_OPTIONS } from "../../lib/payment-methods";
 import { hasAdminSupabaseConfig, supabaseAdminFetch } from "../../lib/supabase-admin";
 
 async function getAdminData() {
@@ -73,9 +75,65 @@ export default async function AdminPage({ searchParams }) {
           <p className="card-label">Admin dashboard</p>
           <h1>Resident treatment signups</h1>
         </div>
-        <form action="/api/admin/logout" method="post">
-          <button className="secondary-button" type="submit">Log out</button>
-        </form>
+        <div className="admin-header-actions">
+          <AddPropertyModal>
+            <form className="admin-form" action="/api/admin/properties" method="post">
+              <label>
+                Property name
+                <input name="name" type="text" required />
+              </label>
+              <label>
+                Link slug
+                <input name="slug" type="text" placeholder="oak-grove" />
+              </label>
+              <label>
+                Address
+                <input name="address" type="text" />
+              </label>
+              <label>
+                Service schedule
+                <input name="service_schedule" type="text" placeholder="Each 3rd Thursday of the Month" required />
+              </label>
+              <label>
+                Next service date
+                <input name="next_service_date" type="date" />
+              </label>
+              <label>
+                Admin note
+                <textarea name="next_service_note" rows="3" placeholder="Example: Confirmed with manager for the upcoming Thursday visit." />
+              </label>
+              <label>
+                Resident fee
+                <span className="money-input">
+                  <span>$</span>
+                  <input name="resident_fee" type="number" min="0" step="0.01" defaultValue="40" required />
+                </span>
+              </label>
+              <label>
+                Payment accepted
+                <select name="payment_methods" defaultValue="cash_check">
+                  {PAYMENT_METHOD_OPTIONS.map((option) => (
+                    <option value={option.value} key={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Resident notes
+                <textarea name="notes" rows="4" defaultValue="Please be available by phone in case the technician or property team needs to coordinate access." />
+              </label>
+              <label className="admin-check">
+                <input name="is_active" type="checkbox" defaultChecked />
+                Active signup page
+              </label>
+              <button className="submit-button" type="submit">Create property</button>
+            </form>
+          </AddPropertyModal>
+          <form action="/api/admin/logout" method="post">
+            <button className="secondary-button" type="submit">Log out</button>
+          </form>
+        </div>
       </header>
 
       {setupError ? (
@@ -104,7 +162,7 @@ export default async function AdminPage({ searchParams }) {
       {adminWarning === "run-schema" ? (
         <section className="admin-alert">
           <strong>Property saved, but the database schema needs updating.</strong>
-          <span>Run the latest supabase/schema.sql so the Last updated field can work correctly.</span>
+          <span>Run the latest supabase/schema.sql so new property fields can work correctly.</span>
         </section>
       ) : null}
 
@@ -248,6 +306,16 @@ export default async function AdminPage({ searchParams }) {
                           <span>$</span>
                           <input name="resident_fee" type="number" min="0" step="0.01" defaultValue={property.resident_fee} required />
                         </span>
+                      </label>
+                      <label>
+                        Payment accepted
+                        <select name="payment_methods" defaultValue={property.payment_methods || "cash_check"}>
+                          {PAYMENT_METHOD_OPTIONS.map((option) => (
+                            <option value={option.value} key={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
                       </label>
                       <label>
                         Resident notes
@@ -402,51 +470,6 @@ export default async function AdminPage({ searchParams }) {
             </div>
           </section>
 
-          <section className="admin-panel">
-            <h2>Add property</h2>
-            <form className="admin-form" action="/api/admin/properties" method="post">
-              <label>
-                Property name
-                <input name="name" type="text" required />
-              </label>
-              <label>
-                Link slug
-                <input name="slug" type="text" placeholder="oak-grove" />
-              </label>
-              <label>
-                Address
-                <input name="address" type="text" />
-              </label>
-              <label>
-                Service schedule
-                <input name="service_schedule" type="text" placeholder="Each 3rd Thursday of the Month" required />
-              </label>
-              <label>
-                Next service date
-                <input name="next_service_date" type="date" />
-              </label>
-              <label>
-                Admin note
-                <textarea name="next_service_note" rows="3" placeholder="Example: Confirmed with manager for the upcoming Thursday visit." />
-              </label>
-              <label>
-                Resident fee
-                <span className="money-input">
-                  <span>$</span>
-                  <input name="resident_fee" type="number" min="0" step="0.01" defaultValue="40" required />
-                </span>
-              </label>
-              <label>
-                Resident notes
-                <textarea name="notes" rows="4" defaultValue="Please be available by phone in case the technician or property team needs to coordinate access." />
-              </label>
-              <label className="admin-check">
-                <input name="is_active" type="checkbox" defaultChecked />
-                Active signup page
-              </label>
-              <button className="submit-button" type="submit">Create property</button>
-            </form>
-          </section>
         </aside>
       </section>
     </main>

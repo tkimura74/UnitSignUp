@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { formatHawaiiDate } from "../../../lib/date-format";
+import { getPaymentMethodText } from "../../../lib/payment-methods";
 
 export default function TechnicianList({ property, submissions, token }) {
   const [items, setItems] = useState(submissions);
@@ -62,7 +63,9 @@ export default function TechnicianList({ property, submissions, token }) {
         </div>
         <div>
           <span>Payment</span>
-          <strong>${Number(property.resident_fee || 40).toFixed(2)} to {property.payable_to}</strong>
+          <strong>
+            ${Number(property.resident_fee || 40).toFixed(2)} {getPaymentMethodText(property.payment_methods)} to {property.payable_to}
+          </strong>
         </div>
       </section>
 

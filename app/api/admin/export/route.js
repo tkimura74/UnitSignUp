@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "../../../../lib/admin-auth";
+import { getPaymentMethodText } from "../../../../lib/payment-methods";
 import { supabaseAdminFetch } from "../../../../lib/supabase-admin";
 
 function csvValue(value) {
@@ -23,7 +24,7 @@ export async function GET(request) {
       : `&service_date=eq.${encodeURIComponent(serviceDate)}`
     : "";
   const submissions = await supabaseAdminFetch(
-    `submissions?select=service_date,created_at,resident_name,unit_number,phone_number,payment_acknowledged,technician_completed,technician_notes,properties!inner(name,slug,address,next_service_date,next_service_note,resident_fee,payable_to)&order=created_at.desc${propertyFilter}${serviceDateFilter}`
+    `submissions?select=service_date,created_at,resident_name,unit_number,phone_number,payment_acknowledged,technician_completed,technician_notes,properties!inner(name,slug,address,next_service_date,next_service_note,resident_fee,payment_methods,payable_to)&order=created_at.desc${propertyFilter}${serviceDateFilter}`
   );
 
   let rows;
@@ -54,7 +55,7 @@ export async function GET(request) {
         submission.unit_number,
         submission.resident_name,
         submission.phone_number,
-        `$${Number(submission.properties?.resident_fee || 40).toFixed(2)} cash/check`,
+        `$${Number(submission.properties?.resident_fee || 40).toFixed(2)} ${getPaymentMethodText(submission.properties?.payment_methods)}`,
         submission.properties?.payable_to || "ORKIN LLC",
         submission.technician_completed ? "Yes" : "No",
         submission.technician_notes || ""

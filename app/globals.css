@@ -643,6 +643,13 @@ textarea:focus {
   gap: 18px;
 }
 
+.admin-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 .export-actions {
   display: flex;
   flex-wrap: wrap;
@@ -698,6 +705,56 @@ textarea:focus {
 
 .admin-alert span {
   color: var(--muted);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(23, 32, 42, 0.56);
+}
+
+.modal-panel {
+  width: min(620px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: auto;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+}
+
+.modal-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.modal-heading h2 {
+  margin: 0;
+}
+
+.modal-close {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background: #fff1f1;
 }
 
 .admin-form {
@@ -1244,6 +1301,16 @@ th {
     flex-direction: column;
   }
 
+  .admin-header-actions {
+    justify-content: stretch;
+  }
+
+  .admin-header-actions .submit-button,
+  .admin-header-actions .secondary-button,
+  .admin-header-actions form {
+    width: 100%;
+  }
+
   .export-actions {
     justify-content: stretch;
   }
@@ -1271,5 +1338,14 @@ th {
 
   .privacy-panel {
     padding: 24px;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .modal-panel {
+    max-height: calc(100vh - 24px);
+    padding: 22px;
   }
 }

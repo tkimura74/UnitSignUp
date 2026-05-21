@@ -3,6 +3,7 @@
 import Script from "next/script";
 import { useEffect, useMemo, useState } from "react";
 import { formatHawaiiDate, formatHawaiiDateTime } from "../../../lib/date-format";
+import { getPaymentMethodText } from "../../../lib/payment-methods";
 
 export default function SignupForm({ property }) {
   const [status, setStatus] = useState("idle");
@@ -42,6 +43,7 @@ export default function SignupForm({ property }) {
     );
     return `mailto:Branch801@rollins.com?subject=${subject}&body=${body}`;
   }, [property.name]);
+  const paymentMethodText = getPaymentMethodText(property.payment_methods);
   const lastUpdated = property.updated_at || property.created_at;
 
   function updateField(event) {
@@ -82,7 +84,7 @@ export default function SignupForm({ property }) {
 
     setStatus("success");
     setMessage(
-      `${formData.residentName.trim()} in unit ${formData.unitNumber.trim()} has been added for ${property.name}. You do not need to submit again unless your information changes. Please make sure your unit can be accessed during the scheduled service window and have ${fee} cash or check payable to ${property.payable_to} ready at the time of service.`
+      `${formData.residentName.trim()} in unit ${formData.unitNumber.trim()} has been added for ${property.name}. You do not need to submit again unless your information changes. Please make sure your unit can be accessed during the scheduled service window and have ${fee} ${paymentMethodText} payable to ${property.payable_to} ready at the time of service.`
     );
   }
 
@@ -127,7 +129,7 @@ export default function SignupForm({ property }) {
             ) : null}
             <div className="visit-row">
               <span>Resident fee</span>
-              <strong>{fee} cash or check</strong>
+              <strong>{fee} {paymentMethodText}</strong>
             </div>
             <div className="visit-row">
               <span>Payable to</span>
@@ -211,7 +213,7 @@ export default function SignupForm({ property }) {
                   required
                 />
                 <span>
-                  I agree to pay <strong>{fee} by cash or check payable to {property.payable_to}</strong>
+                  I agree to pay <strong>{fee} by {paymentMethodText} payable to {property.payable_to}</strong>
                   {" "}at the time of service.
                 </span>
               </label>

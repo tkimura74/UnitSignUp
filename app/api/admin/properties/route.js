@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "../../../../lib/admin-auth";
+import { normalizePaymentMethod } from "../../../../lib/payment-methods";
 import { supabaseAdminFetch } from "../../../../lib/supabase-admin";
 import { randomUUID } from "node:crypto";
 
@@ -20,11 +21,14 @@ async function insertProperty(body) {
     });
     return false;
   } catch (error) {
-    if (!String(error?.message || error).includes("updated_at")) {
+    const message = String(error?.message || error);
+    const canUseFallback = message.includes("updated_at") || message.includes("payment_methods");
+
+    if (!canUseFallback) {
       throw error;
     }
 
-    const { updated_at, ...fallbackBody } = body;
+    const { updated_at, payment_methods, ...fallbackBody } = body;
     await supabaseAdminFetch("properties", {
       method: "POST",
       headers: { Prefer: "return=minimal" },
@@ -64,6 +68,7 @@ export async function POST(request) {
     next_service_note: String(formData.get("next_service_note") || "").trim(),
     technician_token: randomUUID(),
     resident_fee: Number(formData.get("resident_fee") || 40),
+    payment_methods: normalizePaymentMethod(String(formData.get("payment_methods") || "cash_check")),
     payable_to: "ORKIN LLC",
     notes: String(formData.get("notes") || "").trim(),
     is_active: formData.get("is_active") === "on",
